@@ -1,4 +1,4 @@
-# tf_chef_supermarket
+# tf_chef_analytics
 Terraform plan for adding Chef Analytics. Requires Chef Server
 
 ## Assumptions
