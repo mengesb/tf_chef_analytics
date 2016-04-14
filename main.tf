@@ -203,6 +203,7 @@ resource "aws_instance" "chef-analytics" {
     attributes_json = "${template_file.attributes-json.rendered}"
     environment     = "_default"
     run_list        = ["recipe[system::default]","recipe[chef-analytics::default]"]
+    log_to_file     = "${var.log_to_file}"
     node_name       = "${aws_instance.chef-analytics.tags.Name}"
     server_url      = "https://${var.chef_fqdn}/organizations/${var.chef_org}"
     validation_client_name = "${var.chef_org}-validator"
