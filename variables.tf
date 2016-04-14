@@ -137,6 +137,10 @@ variable "knife_rb" {
   description = "Path to your knife.rb configuration"
   default     = ".chef/knife.rb"
 }
+variable "log_to_file" {
+  description = "Output chef-client runtime to logfiles/"
+  default     = true
+}
 variable "public_ip" {
   description = "Associate a public IP to the instance"
   default     = true
