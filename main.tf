@@ -90,7 +90,10 @@ resource "null_resource" "oc_id-analytics" {
   provisioner "local-exec" {
     command = <<EOC
 rm -rf .analytics ; mkdir -p .analytics
+echo "Artifical sleep...ZZzzZZzz" && sleep 30
 bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
+f_size=`wc -c <.analytics/attributes.json.orig`
+[ $fsize -le 5 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
 grep -q 'applications' .analytics/attributes.json.orig
 result=$?
 [ $result -eq 0 ] && sed "s/\(configuration.*}\)\\\n}\\\n\",/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
