@@ -125,10 +125,6 @@ EOC
     command = "rm -rf cookbooks"
   }
 }
-#module "ocid-attributes" {
-#  source = "github.com/mengesb/tf_filemodule"
-#  file = ".analytics/${var.hostname}.${var.domain}-attributes.json"
-#}
 #
 # Analytics
 #
@@ -137,6 +133,7 @@ resource "aws_instance" "chef-analytics" {
   ami           = "${lookup(var.ami_map, format("%s-%s", var.ami_os, var.aws_region))}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
+  associate_public_ip_address = "${var.public_ip}"
   subnet_id     = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-analytics.id}"]
   key_name      = "${var.aws_key_name}"
@@ -145,7 +142,7 @@ resource "aws_instance" "chef-analytics" {
     Description = "${var.tag_description}"
   }
   root_block_device = {
-    delete_on_termination = true
+    delete_on_termination = "${var.root_delete_termination}"
   }
   connection {
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
@@ -210,24 +207,7 @@ resource "aws_instance" "chef-analytics" {
     server_url      = "https://${var.chef_fqdn}/organizations/${var.chef_org}"
     validation_client_name = "${var.chef_org}-validator"
     validation_key  = "${file("${var.chef_org_validator}")}"
+    version         = "${var.client_version}"
   }
-}
-# Public Route53 DNS record
-resource "aws_route53_record" "chef-analytics" {
-  count    = "${var.r53}"
-  zone_id  = "${var.r53_zone_id}"
-  name     = "${aws_instance.chef-analytics.tags.Name}"
-  type     = "A"
-  ttl      = "${var.r53_ttl}"
-  records  = ["${aws_instance.chef-analytics.public_ip}"]
-}
-# Private Route53 DNS record
-resource "aws_route53_record" "chef-analytics-private" {
-  count    = "${var.r53}"
-  zone_id  = "${var.r53_zone_internal_id}"
-  name     = "${aws_instance.chef-analytics.tags.Name}"
-  type     = "A"
-  ttl      = "${var.r53_ttl}"
-  records  = ["${aws_instance.chef-analytics.private_ip}"]
 }
 

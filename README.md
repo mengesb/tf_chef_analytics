@@ -50,13 +50,12 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `chef_org`: Chef organization to join to
 * `chef_org_validator`: Path to your organization validation PEM
 * `chef_sg`: The Chef server's security group (to allow access to/from Analytics)
+* `client_version`: Chef client version. Default: `12.8.1`
 * `domain`: Server's domain name. Default: `localdomain`
 * `hostname`: Server's hostname. Default: `analytics`
 * `knife_rb`: Path to your knife.rb configuration
-* `r53`: Boolean determines if Route53 will be used or not. Default: `0`
-* `r53_ttl`: Time to Live (TTL) setting for Route53 A record to be created. Default: `180`
-* `r53_zone_id`: AWS Route53 Zone ID to add an A record for the Chef Server
-* `r53_zone_internal_id`: AWS Route53 Internal Zone ID to add an A record for the Chef Server
+* `public_ip`: ssociate public IP to instance. Default `true`
+* `root_delete_termination`: Delete root device on VM termination. Default: `true`
 * `server_count`: Server count. Default: `1`; DO NOT CHANGE!
 * `ssl_cert`: Server SSL certificate in PEM format
 * `ssl_key`: Server SSL certificate key

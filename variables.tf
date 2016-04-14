@@ -121,6 +121,10 @@ variable "chef_org_validator" {
 variable "chef_sg" {
   description = "Chef Server security group id"
 }
+variable "client_version" {
+  description = "Version of the chef-client software to install"
+  default     = "12.8.1"
+}
 variable "domain" {
   description = "Server domain name"
   default     = "localdomain"
@@ -133,21 +137,13 @@ variable "knife_rb" {
   description = "Path to your knife.rb configuration"
   default     = ".chef/knife.rb"
 }
-variable "r53" {
-  description = "Use Route53"
-  default     = 0
+variable "public_ip" {
+  description = "Associate a public IP to the instance"
+  default     = true
 }
-variable "r53_ttl" {
-  description = "Route53 A record TTL (Default: 180)"
-  default     = 180
-}
-variable "r53_zone_id" {
-  description = "Route53 zone id for public DNS"
-  default     = 0
-}
-variable "r53_zone_internal_id" {
-  description = "Route53 zone id for internal DNS"
-  default     = 0
+variable "root_delete_termination" {
+  description = "Delete server root block device on termination"
+  default     = true
 }
 variable "server_count" {
   description = "Number of servers to provision. DO NOT CHANGE!"
