@@ -1,4 +1,4 @@
-# Chef Analytics AWS security group
+# Chef Analytics AWS security group https://docs.chef.io/server_firewalls_and_ports.html#chef-analytics-title
 resource "aws_security_group" "chef-analytics" {
   name        = "${var.hostname}.${var.domain} security group"
   description = "Analytics server ${var.hostname}.${var.domain}"
@@ -61,7 +61,9 @@ resource "aws_security_group_rule" "chef-analytics_allow_all" {
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-analytics.id}"
 }
-# Hack chef-server's attributes to support an analytics server
+#
+# Analytics authenticates on Chef Server OC-ID service
+#
 resource "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
@@ -130,7 +132,7 @@ EOC
 #
 resource "aws_instance" "chef-analytics" {
   depends_on    = ["null_resource.oc_id-analytics"]
-  ami           = "${lookup(var.ami_map, format("%s-%s", var.ami_os, var.aws_region))}"
+  ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
   associate_public_ip_address = "${var.public_ip}"
@@ -171,7 +173,7 @@ resource "aws_instance" "chef-analytics" {
     ]
   }
   provisioner "file" {
-    source      = "${path.module}/.analytics/actions-source.json"
+    source      = ".analytics/actions-source.json"
     destination = ".analytics/actions-source.json"
   }
   provisioner "file" {

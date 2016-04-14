@@ -14,6 +14,7 @@ Terraform plan for adding Chef Analytics. Requires Chef Server
   * 22/tcp: SSH
   * 443/tcp: HTTPS
   * 80/tcp: HTTP
+  * Chef Server <=> Chef Analytics
 * Understand Terraform and ability to read the source
 
 ## Supported OSes
@@ -43,10 +44,11 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `aws_subnet_id`: The AWS id of the subnet to use. Example: `subnet-ffffffff`
 * `aws_vpc_id`: The AWS id of the VPC to use. Example: `vpc-ffffffff`
 
-### tf_chef_server variables
+### tf_chef_analytics variables
 
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
 * `chef_fqdn`: DNS address of the CHEF Server
+* `chef_ip`: Chef server public IPv4 address
 * `chef_org`: Chef organization to join to
 * `chef_org_validator`: Path to your organization validation PEM
 * `chef_sg`: The Chef server's security group (to allow access to/from Analytics)
@@ -54,6 +56,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `domain`: Server's domain name. Default: `localdomain`
 * `hostname`: Server's hostname. Default: `analytics`
 * `knife_rb`: Path to your knife.rb configuration
+* `log_to_file`: Output chef-client runtime to logfiles/
 * `public_ip`: ssociate public IP to instance. Default `true`
 * `root_delete_termination`: Delete root device on VM termination. Default: `true`
 * `server_count`: Server count. Default: `1`; DO NOT CHANGE!
