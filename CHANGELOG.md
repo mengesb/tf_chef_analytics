@@ -3,6 +3,13 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v0.1.7 (2016-04-15)
+-------------------
+- [Brian Menges] - Update `attributes-json.tpl`, set `system` cookbook to restart network immediately on set
+- [Brian Menges] - Alphabetize `attributes-json.tpl`, except for `fqdn`
+- [Brian Menges] - Add attributes and run_list to setup chef-client as cron job with splay
+- [Brian Menges] - Replaced `analytics_fqdn` with `api_fqdn` to prevent duplicate line entry in `opscode-analytics.rb` generation
+
 v0.1.6 (2016-04-14)
 -------------------
 - [Brian Menges] - Remove `fqdn` from `attributes-json.tpl`: conflicting duplicate entry during first chef-client run
