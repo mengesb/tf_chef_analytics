@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v0.1.6 (2016-04-14)
+-------------------
+- [Brian Menges] - Remove `fqdn` from `attributes-json.tpl`: conflicting duplicate entry during first chef-client run
+
 v0.1.5 (2016-04-14)
 -------------------
 - [Brian Menges] - DNS can be slow... adding laziness to API call
