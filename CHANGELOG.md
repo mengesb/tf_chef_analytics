@@ -3,6 +3,11 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v0.1.8 (2016-04-15)
+-------------------
+- [Brian Menges] - Fix local-exec, use variable `${var.chef_ip}` in both test cases, not just one
+- [Brian Menges] - Fix syntax error in `attributes-json.tpl`
+
 v0.1.7 (2016-04-15)
 -------------------
 - [Brian Menges] - Update `attributes-json.tpl`, set `system` cookbook to restart network immediately on set

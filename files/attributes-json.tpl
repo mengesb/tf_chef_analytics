@@ -10,7 +10,7 @@
     }
   },
   "chef_client": {
-    "init_style": "none",
+    "init_style": "none"
   },
   "firewall": {
     "allow_established": true,

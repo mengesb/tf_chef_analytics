@@ -97,7 +97,7 @@ f_size=`wc -c <.analytics/attributes.json.orig`
 grep -q 'applications' .analytics/attributes.json.orig
 result=$?
 [ $result -eq 0 ] && sed "s/\(configuration.*}\)\\\n}\\\n\",/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
-[ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\nrabbitmq['vip'] = '0.0.0.0'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
+[ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
 echo "Modified Chef server attributes at .analytics/attributes.json"
 EOC
   }
