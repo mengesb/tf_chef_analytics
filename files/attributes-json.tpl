@@ -1,5 +1,4 @@
 {
-  "fqdn": "${host}.${domain}",
   "chef-analytics": {
     "configuration": {
       "analytics_fqdn": "${host}.${domain}",
@@ -20,4 +19,3 @@
   },
   "tags": []
 }
-
