@@ -88,23 +88,29 @@ resource "null_resource" "oc_id-analytics" {
   }
   # Generate new attributes file with analytics oc_id subscription
   provisioner "local-exec" {
-    command = <<EOC
-rm -rf .analytics ; mkdir -p .analytics
-echo "Artifical sleep...ZZzzZZzz" && sleep 30
-bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
-f_size=`wc -c <.analytics/attributes.json.orig`
-[ $fsize -le 5 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
-grep -q 'applications' .analytics/attributes.json.orig
-result=$?
-[ $result -eq 0 ] && sed "s/\(configuration.*}\)\\\n}\\\n\",/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
-[ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
-echo "Modified Chef server attributes at .analytics/attributes.json"
-EOC
+    command = <<-EOC
+      rm -rf .analytics ; mkdir -p .analytics
+      echo "Artifical sleep...ZZzzZZzz" && sleep 30
+      bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
+      f_size=`wc -c <.analytics/attributes.json.orig`
+      [ $fsize -le 5 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
+      grep -q 'applications' .analytics/attributes.json.orig
+      result=$?
+      [ $result -eq 0 ] && sed "s/\(configuration.*}\)\\\n}\\\n\",/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
+      [ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
+      echo -en "rabbitmq['vip'] = '${var.chef_ip}'\nrabbitmq['node_ip_address'] = '0.0.0.0'\n" .analytics/rabbitmq.modify
+      echo "Modified Chef server attributes at .analytics/attributes.json"
+      EOC
   }
   # Upload new attributes file
   provisioner "file" {
     source      = ".analytics/attributes.json"
-    destination = "attributes.json"
+    destination = ".analytics/attributes.json"
+  }
+  # Upload new rabbitmq settings
+  provisioner "file" {
+    source      = ".analytics/rabbitmq.modify"
+    destination = ".analytics/rabbitmq.modify"
   }
   # Execute new Chef run if no analytics.json exists
   # https://docs.chef.io/install_analytics.html
@@ -113,12 +119,18 @@ EOC
       "rm -rf .analytics ; mkdir -p .analytics",
       "[ -f /etc/opscode/oc-id-applications/analytics.json ] && echo ABORT ABORT ABORT ABORT",
       "[ -f /etc/opscode/oc-id-applications/analytics.json ] && exit 1",
-      "sudo chef-client -j attributes.json",
-      "rm -f attributes.json",
+      "sudo grep -q rabbitmq /etc/opscode/chef-server.rb",
+      "[ $? -eq 0 ] && sudo grep rabbitmq /etc/opscode/chef-server.rb > .analytics/rabbitmq.saved",
+      "sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/rabbitmq.saved",
+      "[ -f .analytics/rabbitmq.saved ] && sudo sed -i '/rabbitmq/d' /etc/opscode/chef-server.rb"
       "sudo chef-server-ctl stop",
+      "cat .analytics/rabbitmq.hack | sudo tee -a /etc/opscode/chef-server.rb"
       "sudo chef-server-ctl reconfigure",
       "sudo chef-server-ctl restart",
       "sudo opscode-manage-ctl reconfigure",
+      "sudo chef-client -j .analytics/attributes.json",
+      "rm -f .analytics/attributes.json",
+      "rm -f .analytics/rabbitmq.modify",
       "sudo cp /etc/opscode/oc-id-applications/analytics.json .analytics/analytics.json",
       "sudo cp /etc/opscode-analytics/actions-source.json .analytics/actions-source.json",
       "sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/analytics.json .analytics/actions-source.json",
