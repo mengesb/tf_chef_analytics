@@ -107,6 +107,7 @@ EOC
     destination = "attributes.json"
   }
   # Execute new Chef run if no analytics.json exists
+  # https://docs.chef.io/install_analytics.html
   provisioner "remote-exec" {
     inline = [
       "rm -rf .analytics ; mkdir -p .analytics",
@@ -114,6 +115,10 @@ EOC
       "[ -f /etc/opscode/oc-id-applications/analytics.json ] && exit 1",
       "sudo chef-client -j attributes.json",
       "rm -f attributes.json",
+      "sudo chef-server-ctl stop",
+      "sudo chef-server-ctl reconfigure",
+      "sudo chef-server-ctl restart",
+      "sudo opscode-manage-ctl reconfigure",
       "sudo cp /etc/opscode/oc-id-applications/analytics.json .analytics/analytics.json",
       "sudo cp /etc/opscode-analytics/actions-source.json .analytics/actions-source.json",
       "sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/analytics.json .analytics/actions-source.json",
