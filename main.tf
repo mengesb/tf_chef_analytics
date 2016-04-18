@@ -122,9 +122,9 @@ resource "null_resource" "oc_id-analytics" {
       "sudo grep -q rabbitmq /etc/opscode/chef-server.rb",
       "[ $? -eq 0 ] && sudo grep rabbitmq /etc/opscode/chef-server.rb > .analytics/rabbitmq.saved",
       "sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/rabbitmq.saved",
-      "[ -f .analytics/rabbitmq.saved ] && sudo sed -i '/rabbitmq/d' /etc/opscode/chef-server.rb"
+      "[ -f .analytics/rabbitmq.saved ] && sudo sed -i '/rabbitmq/d' /etc/opscode/chef-server.rb",
       "sudo chef-server-ctl stop",
-      "cat .analytics/rabbitmq.hack | sudo tee -a /etc/opscode/chef-server.rb"
+      "cat .analytics/rabbitmq.hack | sudo tee -a /etc/opscode/chef-server.rb",
       "sudo chef-server-ctl reconfigure",
       "sudo chef-server-ctl restart",
       "sudo opscode-manage-ctl reconfigure",
