@@ -92,7 +92,7 @@ resource "null_resource" "oc_id-analytics" {
       rm -rf .analytics ; mkdir -p .analytics
       echo "Artifical sleep...ZZzzZZzz" && sleep 30
       bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
-      f_size=`wc -c <.analytics/attributes.json.orig`
+      f_size=`wc -c <.analytics/attributes.json.orig|tr -d ' '`
       [ $fsize -le 5 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
       grep -q 'applications' .analytics/attributes.json.orig
       result=$?
@@ -105,12 +105,12 @@ resource "null_resource" "oc_id-analytics" {
   # Upload new attributes file
   provisioner "file" {
     source      = ".analytics/attributes.json"
-    destination = ".analytics/attributes.json"
+    destination = "attributes.json"
   }
   # Upload new rabbitmq settings
   provisioner "file" {
     source      = ".analytics/rabbitmq.modify"
-    destination = ".analytics/rabbitmq.modify"
+    destination = "rabbitmq.modify"
   }
   # Execute new Chef run if no analytics.json exists
   # https://docs.chef.io/install_analytics.html
@@ -124,13 +124,12 @@ resource "null_resource" "oc_id-analytics" {
       "sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/rabbitmq.saved",
       "[ -f .analytics/rabbitmq.saved ] && sudo sed -i '/rabbitmq/d' /etc/opscode/chef-server.rb",
       "sudo chef-server-ctl stop",
-      "cat .analytics/rabbitmq.hack | sudo tee -a /etc/opscode/chef-server.rb",
+      "cat rabbitmq.hack | sudo tee -a /etc/opscode/chef-server.rb",
       "sudo chef-server-ctl reconfigure",
       "sudo chef-server-ctl restart",
       "sudo opscode-manage-ctl reconfigure",
-      "sudo chef-client -j .analytics/attributes.json",
-      "rm -f .analytics/attributes.json",
-      "rm -f .analytics/rabbitmq.modify",
+      "sudo chef-client -j attributes.json",
+      "rm -f attributes.json rabbitmq.modify",
       "sudo cp /etc/opscode/oc-id-applications/analytics.json .analytics/analytics.json",
       "sudo cp /etc/opscode-analytics/actions-source.json .analytics/actions-source.json",
       "sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/analytics.json .analytics/actions-source.json",
