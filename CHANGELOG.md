@@ -3,6 +3,11 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v0.1.12 (2016-04-18)
+-------------------
+- [Brian Menges] - Fixed deleting files after transfered in
+- [Brian Menges] - Fixed math on `f_size`
+
 v0.1.11 (2016-04-18)
 -------------------
 - [Brian Menges] - Missing commas in `remote-exec` call
