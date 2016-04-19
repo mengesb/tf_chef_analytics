@@ -163,4 +163,8 @@ variable "tag_description" {
   description = "Server AWS description tag text"
   default     = "Created using Terraform (tf_chef_analytics)"
 }
+variable "wait_on" {
+  description = "Variable to hold outputs of other moudles to force waiting"
+  default     = "Nothing"
+}
 

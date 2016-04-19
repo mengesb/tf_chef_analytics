@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v0.1.14 (2016-04-18)
+-------------------
+- [Brian Menges] - Adding variable `wait_on` to handle waiting on other module outputs
+
 v0.1.13 (2016-04-18)
 -------------------
 - [Brian Menges] - Removed file size check, replaced with `grep -q`
