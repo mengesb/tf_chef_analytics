@@ -153,6 +153,14 @@ resource "null_resource" "oc_id-analytics" {
   }
 }
 #
+# Wait on
+#
+resource "null_resource" "wait_on" {
+  provisioner "local-exec" {
+    command = "echo Waited on ${var.wait_on} before proceeding"
+  }
+}
+#
 # Analytics
 #
 resource "aws_instance" "chef-analytics" {
