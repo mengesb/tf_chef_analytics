@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v0.1.17 (2016-04-19)
+-------------------
+- [Brian Menges] - replaced echo with tee + HEREDOC
+
 v0.1.16 (2016-04-19)
 -------------------
 - [Brian Menges] - Still working on getting analytics to deploy right
