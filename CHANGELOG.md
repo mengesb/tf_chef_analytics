@@ -3,6 +3,11 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v0.1.13 (2016-04-18)
+-------------------
+- [Brian Menges] - Removed file size check, replaced with `grep -q`
+- [Brian Menges] - Redirect echo into file
+
 v0.1.12 (2016-04-18)
 -------------------
 - [Brian Menges] - Fixed deleting files after transfered in
