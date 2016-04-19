@@ -92,13 +92,13 @@ resource "null_resource" "oc_id-analytics" {
       rm -rf .analytics ; mkdir -p .analytics
       echo "Artifical sleep...ZZzzZZzz" && sleep 30
       bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
-      f_size=`wc -c <.analytics/attributes.json.orig|tr -d ' '`
-      [ $fsize -le 5 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
+      grep -q 'configuration' .analytics/attributes.json.orig
+      [ $? -ne 0 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
       grep -q 'applications' .analytics/attributes.json.orig
       result=$?
       [ $result -eq 0 ] && sed "s/\(configuration.*}\)\\\n}\\\n\",/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
       [ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/" .analytics/attributes.json.orig > .analytics/attributes.json
-      echo -en "rabbitmq['vip'] = '${var.chef_ip}'\nrabbitmq['node_ip_address'] = '0.0.0.0'\n" .analytics/rabbitmq.modify
+      echo -en "rabbitmq['vip'] = '${var.chef_ip}'\nrabbitmq['node_ip_address'] = '0.0.0.0'\n" > .analytics/rabbitmq.modify
       echo "Modified Chef server attributes at .analytics/attributes.json"
       EOC
   }
