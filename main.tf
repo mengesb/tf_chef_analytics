@@ -166,10 +166,10 @@ resource "null_resource" "wait_on" {
   }
 }
 #
-# Analytics
+# Provision server
 #
 resource "aws_instance" "chef-analytics" {
-  depends_on    = ["null_resource.oc_id-analytics"]
+  depends_on    = ["null_resource.oc_id-analytics","null_resource.wait_on"]
   ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"

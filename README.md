@@ -57,12 +57,13 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `hostname`: Server's hostname. Default: `analytics`
 * `knife_rb`: Path to your knife.rb configuration
 * `log_to_file`: Output chef-client runtime to logfiles/
-* `public_ip`: ssociate public IP to instance. Default `true`
+* `public_ip`: Associate public IP to instance. Default `true`
 * `root_delete_termination`: Delete root device on VM termination. Default: `true`
 * `server_count`: Server count. Default: `1`; DO NOT CHANGE!
 * `ssl_cert`: Server SSL certificate in PEM format
 * `ssl_key`: Server SSL certificate key
 * `tag_description`: Text field tag 'Description'
+* `wait_on`: Method for passing in dependencies through modules to control workflow
 
 ### Map variables
 
