@@ -1,8 +1,8 @@
 {
   "fqdn": "${host}.${domain}",
-  "api_fqdn": "${host}.${domain}",
   "chef-analytics": {
     "configuration": {
+      "analytics_fqdn": "${host}.${domain}",
       "ssl": {
         "certificate": "${cert}",
         "certificate_key": "${cert_key}"

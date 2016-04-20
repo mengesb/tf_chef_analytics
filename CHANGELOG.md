@@ -3,6 +3,12 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.0.0 (2016-04-20)
+-------------------
+- [Brian Menges] - `api_fqdn` in [attributes-json.tpl](files/attributes-json.tpl) not correct until second run. Using `analytics_fqdn` again
+- [Brian Menges] - Insert `null_resource.wait_on` into aws instance creation
+- [Brian Menges] - Release v1.0.0
+
 v0.1.17 (2016-04-19)
 -------------------
 - [Brian Menges] - replaced echo with tee + HEREDOC
