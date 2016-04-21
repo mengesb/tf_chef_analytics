@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.0.4 (2016-04-20)
+-------------------
+- [Brian Menges] - Removed template method to generate scripts - intrepreting ${ ... } in the script
+
 v1.0.3 (2016-04-20)
 -------------------
 - [Brian Menges] - remote_oc_script template using wrong template source; fixed
