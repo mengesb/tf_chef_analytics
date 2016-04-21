@@ -142,6 +142,7 @@ resource "null_resource" "oc_id-analytics" {
       "fi",
       "sudo grep -q rabbitmq /etc/opscode/chef-server.rb",
       "if [ $? -eq 0 ]",
+      "then",
       "  sudo grep rabbitmq /etc/opscode/chef-server.rb > .analytics/rabbitmq.saved",
       "  sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/rabbitmq.saved",
       "  sudo sed -i '/rabbitmq/d' /etc/opscode/chef-server.rb",
