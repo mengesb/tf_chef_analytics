@@ -90,7 +90,7 @@ resource "template_file" "local_oc_script" {
   }
 }
 resource "template_file" "remote_oc_script" {
-  template = "${file("${path.module}/files/local_oc_script.tpl")}"
+  template = "${file("${path.module}/files/remote_oc_script.tpl")}"
   vars {
     user      = "${lookup(var.ami_usermap, var.ami_os)}"
   }
