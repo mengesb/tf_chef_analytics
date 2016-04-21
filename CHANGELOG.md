@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.0.2 (2016-04-20)
+-------------------
+- [Brian Menges] - Files not pushed in commit
+
 v1.0.1 (2016-04-20)
 -------------------
 - [Brian Menges] - Convert large remote/local-exec blocks to template written scripts and execute
