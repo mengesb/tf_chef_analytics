@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.0.6 (2016-04-21)
+-------------------
+- [Brian Menges] - Updated usage of `wait_on`
+
 v1.0.5 (2016-04-20)
 -------------------
 - [Brian Menges] - Syntax issue in a remote-exec

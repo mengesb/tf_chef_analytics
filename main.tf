@@ -79,8 +79,16 @@ resource "template_file" "attributes-json" {
     cert_key  = "/var/opt/analytics/ssl/${var.hostname}.${var.domain}.key"
   }
 }
+#
+# Wait on
+#
+resource "null_resource" "wait_on" {
+  provisioner "local-exec" {
+    command = "echo Waited on ${var.wait_on} before proceeding"
+  }
+}
 resource "null_resource" "oc_id-analytics" {
-  depends_on = ["template_file.attributes-json"]
+  depends_on = ["template_file.attributes-json","null_resource.wait_on"]
   connection {
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
     private_key = "${var.aws_private_key_file}"
@@ -176,14 +184,6 @@ resource "null_resource" "oc_id-analytics" {
   }
   provisioner "local-exec" {
     command = "rm -rf cookbooks"
-  }
-}
-#
-# Wait on
-#
-resource "null_resource" "wait_on" {
-  provisioner "local-exec" {
-    command = "echo Waited on ${var.wait_on} before proceeding"
   }
 }
 #
