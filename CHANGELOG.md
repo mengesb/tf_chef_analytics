@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.0.7 (2016-04-22)
+-------------------
+- [Brian Menges] - Because `sed` sucks across platforms, doing some awful things
+
 v1.0.6 (2016-04-21)
 -------------------
 - [Brian Menges] - Updated usage of `wait_on`
