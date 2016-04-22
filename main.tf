@@ -107,16 +107,21 @@ resource "null_resource" "oc_id-analytics" {
       grep -q 'rabbitmq' .analytics/attributes.json.orig
       rabbit=$?
       # Delete any potentially existing rabbitmq configuration that will hurt us
-      [ $rabbit -eq 0 ] && sed "s/rabbitmq\['vip'\][[:space:]]=[[:space:]]'\([[:digit:]]*\.\)\{3\}[[:digit:]]*'\\\n//"             -i.bak .analytics/attributes.json && rm -f .analytics/attributes.json.bak
-      [ $rabbit -eq 0 ] && sed "s/rabbitmq\['node_ip_address'\][[:space:]]=[[:space:]]'\([[:digit:]]*\.\)\{3\}[[:digit:]]*'\\\n//" -i.bak .analytics/attributes.json && rm -f .analytics/attributes.json.bak
+      [ $rabbit -eq 0 ] && sed "s/rabbitmq\['vip'\][[:space:]]=[[:space:]]'\([[:digit:]]*\.\)\{3\}[[:digit:]]*'\\\n//"             .analytics/attributes.json > .analytics/attributes.json.new
+      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
+      [ $rabbit -eq 0 ] && sed "s/rabbitmq\['node_ip_address'\][[:space:]]=[[:space:]]'\([[:digit:]]*\.\)\{3\}[[:digit:]]*'\\\n//" .analytics/attributes.json > .analytics/attributes.json.new
+      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
       # Look for existing oc_id['applications']
       grep -q 'applications' .analytics/attributes.json.orig
       result=$?
       # FOUND... appending
-      [ $result -eq 0 ] && sed "s/\(applications.*\\\n  }\)\\\n/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n/" -i.bak .analytics/attributes.json && rm -f .analytics/attributes.json.bak
-      [ $result -eq 0 ] && sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/"                       -i.bak .analytics/attributes.json && rm -f .analytics/attributes.json.bak
+      [ $result -eq 0 ] && sed "s/\(applications.*\\\n  }\)\\\n/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n/" .analytics/attributes.json > .analytics/attributes.json.new
+      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
+      [ $result -eq 0 ] && sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/"                       .analytics/attributes.json > .analytics/attributes.json.new
+      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
       # NOT FOUND... adding
-      [ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\n\",/" -i.bak .analytics/attributes.json && rm -f .analytics/attributes.json.bak
+      [ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\n\",/" .analytics/attributes.json > .analytics/attributes.json.new
+      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
       tee .analytics/rabbitmq.modify <<EOF
       rabbitmq['vip'] = '${var.chef_ip}'
       rabbitmq['node_ip_address'] = '0.0.0.0'
@@ -153,7 +158,7 @@ resource "null_resource" "oc_id-analytics" {
       "then",
       "  sudo grep rabbitmq /etc/opscode/chef-server.rb > .analytics/rabbitmq.saved",
       "  sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/rabbitmq.saved",
-      "  sudo sed -i '/rabbitmq/d' /etc/opscode/chef-server.rb",
+      "  sudo sed -i.bak '/rabbitmq/d' /etc/opscode/chef-server.rb",
       "fi",
       "sudo chef-server-ctl stop",
       "cat rabbitmq.modify | sudo tee -a /etc/opscode/chef-server.rb",
