@@ -3,6 +3,12 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.1.0 (2016-04-25)
+-------------------
+- [Brian Menges] - Update comments to several segments
+- [Brian Menges] - Remove sg <-> sg global between Analytics and Chef Server
+- [Brian Menges] - Remove unnecessary template write
+
 v1.0.7 (2016-04-22)
 -------------------
 - [Brian Menges] - Because `sed` sucks across platforms, doing some awful things

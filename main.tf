@@ -34,21 +34,12 @@ resource "aws_security_group_rule" "chef-analytics_allow_443_tcp_all" {
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-analytics.id}"
 }
-# Chef Server -> Analytics
-resource "aws_security_group_rule" "chef-analytics_allow_all_chef-server" {
-  type        = "ingress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
-  source_security_group_id = "${var.chef_sg}"
-  security_group_id = "${aws_security_group.chef-analytics.id}"
-}
-# Analytics -> Chef Server
+# Analytics -> Chef Server RabbitMQ
 resource "aws_security_group_rule" "chef-server_allow_all_chef-analytics" {
   type        = "ingress"
-  from_port   = 0
-  to_port     = 0
-  protocol    = "-1"
+  from_port   = 5672
+  to_port     = 5672
+  protocol    = "tcp"
   source_security_group_id = "${aws_security_group.chef-analytics.id}"
   security_group_id = "${var.chef_sg}"
 }
@@ -68,7 +59,7 @@ provider "aws" {
   region     = "${var.aws_region}"
 }
 #
-# Analytics authenticates on Chef Server OC-ID service
+# Provisioning template
 #
 resource "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
@@ -87,6 +78,9 @@ resource "null_resource" "wait_on" {
     command = "echo Waited on ${var.wait_on} before proceeding"
   }
 }
+#
+# Analytics oc-id
+#
 resource "null_resource" "oc_id-analytics" {
   depends_on = ["template_file.attributes-json","null_resource.wait_on"]
   connection {
@@ -178,15 +172,19 @@ resource "null_resource" "oc_id-analytics" {
   provisioner "local-exec" {
     command = "scp -r -o StrictHostKeyChecking=no ${lookup(var.ami_usermap, var.ami_os)}@${var.chef_fqdn}:.analytics/*.json .analytics/"
   }
+  # Download required cookbooks
   provisioner "local-exec" {
     command = "rm -rf cookbooks ; git clone https://github.com/chef-cookbooks/chef-analytics cookbooks/chef-analytics"
   }
+  # Remove conflicting .chef directory
   provisioner "local-exec" {
     command = "rm -rf cookbooks/chef-analytics/.chef"
   }
+  # Upload required cookbooks
   provisioner "local-exec" {
     command = "cd cookbooks/chef-analytics && berks install && berks upload"
   }
+  # Clean up
   provisioner "local-exec" {
     command = "rm -rf cookbooks"
   }
@@ -215,6 +213,7 @@ resource "aws_instance" "chef-analytics" {
     private_key = "${var.aws_private_key_file}"
     host        = "${self.public_ip}"
   }
+  # Clean up any potential node/client conflicts
   provisioner "local-exec" {
     command = "knife node-delete   ${var.hostname}.${var.domain} -y -c ${var.knife_rb} ; echo OK"
   }
@@ -230,12 +229,14 @@ resource "aws_instance" "chef-analytics" {
       "echo Say WHAT one more time"
     ]
   }
+  # Prepare some directories to stage files
   provisioner "remote-exec" {
     inline = [
       "mkdir -p .analytics",
       "sudo mkdir -p /etc/opscode-analytics /var/opt/analytics/ssl",
     ]
   }
+  # Transfer in required files
   provisioner "file" {
     source      = ".analytics/actions-source.json"
     destination = ".analytics/actions-source.json"
@@ -248,14 +249,7 @@ resource "aws_instance" "chef-analytics" {
     source      = "${var.ssl_key}"
     destination = ".analytics/${var.hostname}.${var.domain}.key"
   }
-  provisioner "remote-exec" {
-    inline = [
-      "cat > attributes.json <<EOF",
-      "${template_file.attributes-json.rendered}",
-      "EOF",
-      ""
-    ]
-  }
+  # Move files to final location
   provisioner "remote-exec" {
     inline = [
       "sudo mv .analytics/${var.hostname}.${var.domain}.* /var/opt/analytics/ssl",
