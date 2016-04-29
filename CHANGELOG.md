@@ -3,6 +3,13 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.1.1 (2016-04-28)
+-------------------
+- [Brian Menges] - Chef now requires accepting their MLSA. Added handles for that
+- [Brian Menges] - Variable `accept_license` accepts `0` for false (default) and `1` for true (required)
+- [Brian Menges] - Updated `/var/opt/analytics` to `/var/opt/opscode-analytics`
+- [Brian Menges] - Added `null_resource` handles to take care of `accept_license`
+
 v1.1.0 (2016-04-25)
 -------------------
 - [Brian Menges] - Update comments to several segments
