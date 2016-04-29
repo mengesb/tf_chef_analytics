@@ -64,10 +64,10 @@ provider "aws" {
 resource "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
-    cert      = "/var/opt/analytics/ssl/${var.hostname}.${var.domain}.crt"
+    cert      = "/var/opt/opscode-analytics/ssl/${var.hostname}.${var.domain}.crt"
     domain    = "${var.domain}"
     host      = "${var.hostname}"
-    cert_key  = "/var/opt/analytics/ssl/${var.hostname}.${var.domain}.key"
+    cert_key  = "/var/opt/opscode-analytics/ssl/${var.hostname}.${var.domain}.key"
   }
 }
 #
@@ -93,7 +93,6 @@ resource "null_resource" "oc_id-analytics" {
     command = <<-EOC
       set +x
       rm -rf .analytics ; mkdir -p .analytics
-      echo "Artifical sleep...ZZzzZZzz" && sleep 30
       bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
       grep -q 'configuration' .analytics/attributes.json.orig
       [ $? -ne 0 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig

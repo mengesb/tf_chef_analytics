@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.1.2 (2016-04-29)
+-------------------
+- [Brian Menges] - Fix certificate location in template
+
 v1.1.1 (2016-04-28)
 -------------------
 - [Brian Menges] - Chef now requires accepting their MLSA. Added handles for that
