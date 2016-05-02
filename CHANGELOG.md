@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.1.4 (2016-05-02)
+-------------------
+- [Brian Menges] - Remove tags on root_block_device
+
 v1.1.3 (2016-05-02)
 -------------------
 - [Brian Menges] - Replaced `accept_license` numeric with boolean. Now part of `template_file.attributes-json`
