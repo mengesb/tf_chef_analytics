@@ -64,7 +64,7 @@ provider "aws" {
 resource "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
-    license   = ${var.accept_license}
+    license   = "${var.accept_license}"
     cert      = "/var/opt/opscode-analytics/ssl/${var.hostname}.${var.domain}.crt"
     domain    = "${var.domain}"
     host      = "${var.hostname}"

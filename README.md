@@ -47,6 +47,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 ### tf_chef_analytics variables
 
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
+* `analytics_version`: Version of Chef Analytics to install. Default: `1.4.0`
 * `chef_fqdn`: DNS address of the CHEF Server
 * `chef_ip`: Chef server public IPv4 address
 * `chef_org`: Chef organization to join to
@@ -59,6 +60,8 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `log_to_file`: Output chef-client runtime to logfiles/
 * `public_ip`: Associate public IP to instance. Default `true`
 * `root_delete_termination`: Delete root device on VM termination. Default: `true`
+* `root_volume_size`: Size of the root volume in GB. Default: `20`
+* `root_volume_type`: Type of root volume. Supports `gp2` and `standard`. Default `standard`
 * `server_count`: Server count. Default: `1`; DO NOT CHANGE!
 * `ssl_cert`: Server SSL certificate in PEM format
 * `ssl_key`: Server SSL certificate key

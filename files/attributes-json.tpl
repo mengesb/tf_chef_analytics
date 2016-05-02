@@ -1,7 +1,7 @@
 {
   "fqdn": "${host}.${domain}",
   "chef-analytics": {
-    "accept_license": "${license}",
+    "accept_license": ${license},
     "api_fqdn": "${host}.${domain}",
     "configuration": {
       "ssl": {

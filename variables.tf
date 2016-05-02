@@ -104,7 +104,7 @@ variable "ami_usermap" {
 #
 variable "accept_license" {
   description = "Acceptance of the Chef MLSA: https://www.chef.io/online-master-agreement/"
-  default     = 0
+  default     = false
 }
 variable "analytics_version" {
   description = "Version of Chef Analytics to install"
