@@ -64,10 +64,12 @@ provider "aws" {
 resource "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
+    license   = "${var.accept_license}"
     cert      = "/var/opt/opscode-analytics/ssl/${var.hostname}.${var.domain}.crt"
     domain    = "${var.domain}"
     host      = "${var.hostname}"
     cert_key  = "/var/opt/opscode-analytics/ssl/${var.hostname}.${var.domain}.key"
+    version   = "${var.analytics_version}"
   }
 }
 #
@@ -189,20 +191,10 @@ resource "null_resource" "oc_id-analytics" {
   }
 }
 #
-# Accept Chef MLSA
-#
-resource "null_resource" "chef_mlsa" {
-  depends_on = ["null_resource.oc_id-analytics"]
-  count = "${var.accept_license}"
-  provisioner "local-exec" {
-    command = "touch .analytics/.license.accepted"
-  }
-}
-#
 # Provision server
 #
 resource "aws_instance" "chef-analytics" {
-  depends_on    = ["null_resource.wait_on","null_resource.oc_id-analytics","null_resource.chef_mlsa"]
+  depends_on    = ["null_resource.wait_on","null_resource.oc_id-analytics"]
   ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
@@ -216,6 +208,11 @@ resource "aws_instance" "chef-analytics" {
   }
   root_block_device = {
     delete_on_termination = "${var.root_delete_termination}"
+    volume_size = "${var.root_volume_size}"
+    volume_type = "${var.root_volume_type}"
+    tags = {
+      Name      = "${var.hostname}.${var.domain}"
+    }
   }
   connection {
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
@@ -245,11 +242,6 @@ resource "aws_instance" "chef-analytics" {
       "sudo mkdir -p /etc/opscode-analytics /var/opt/opscode-analytics/ssl",
     ]
   }
-  # Transfer in required files
-  provisioner "file" {
-    source      = ".analytics/.license.accepted"
-    destination = ".analytics/.license.accepted"
-  }
   provisioner "file" {
     source      = ".analytics/actions-source.json"
     destination = ".analytics/actions-source.json"
@@ -265,7 +257,6 @@ resource "aws_instance" "chef-analytics" {
   # Move files to final location
   provisioner "remote-exec" {
     inline = [
-      "sudo mv .analytics/.license.accepted /var/opt/opscode-analytics/.license.accepted",
       "sudo mv .analytics/${var.hostname}.${var.domain}.* /var/opt/opscode-analytics/ssl",
       "sudo mv .analytics/actions-source.json /etc/opscode-analytics/actions-source.json",
       "sudo chown -R root:root /etc/opscode-analytics /var/opt/opscode-analytics",

@@ -3,6 +3,18 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.1.3 (2016-05-02)
+-------------------
+- [Brian Menges] - Replaced `accept_license` numeric with boolean. Now part of `template_file.attributes-json`
+- [Brian Menges] - Added `volume_size` and `volume_type` specifications and `root_` variables for mentioned tunables to instance deployted
+- [Brian Menges] - Removed `null_resource` for Chef MLSA handles
+- [Brian Menges] - Added `analytics_version` to specify Chef Analytics installation version
+- [Brian Menges] - Set default `root_volume_size` to 20 GB
+- [Brian Menges] - Set default `root_volume_type` to `standard`
+- [Brian Menges] - Added Name tag to `root_block_device` of `${var.hostname}.${var.domain} /`
+- [Brian Menges] - NOTE: incompatible with root type `io1`
+- [Brian Menges] - Fidgiting with `api_fqdn` in [attributes-json.tpl](files/attributes-json.tpl)
+
 v1.1.2 (2016-04-29)
 -------------------
 - [Brian Menges] - Fix certificate location in template

@@ -1,13 +1,15 @@
 {
   "fqdn": "${host}.${domain}",
   "chef-analytics": {
+    "accept_license": ${license},
+    "api_fqdn": "${host}.${domain}",
     "configuration": {
-      "analytics_fqdn": "${host}.${domain}",
       "ssl": {
         "certificate": "${cert}",
         "certificate_key": "${cert_key}"
       }
-    }
+    },
+    "version": "${version}"
   },
   "chef_client": {
     "init_style": "none"

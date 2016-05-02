@@ -104,7 +104,11 @@ variable "ami_usermap" {
 #
 variable "accept_license" {
   description = "Acceptance of the Chef MLSA: https://www.chef.io/online-master-agreement/"
-  default     = 0
+  default     = false
+}
+variable "analytics_version" {
+  description = "Version of Chef Analytics to install"
+  default     = "1.4.0"
 }
 variable "allowed_cidrs" {
   description = "List of CIDRs to allow SSH from (CSV list allowed)"
@@ -152,6 +156,14 @@ variable "public_ip" {
 variable "root_delete_termination" {
   description = "Delete server root block device on termination"
   default     = true
+}
+variable "root_volume_size" {
+  description = "Size in GB of root device"
+  default     = 20
+}
+variable "root_volume_type" {
+  description = "Type of root volume"
+  default     = "standard"
 }
 variable "server_count" {
   description = "Number of servers to provision. DO NOT CHANGE!"
