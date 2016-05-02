@@ -210,9 +210,6 @@ resource "aws_instance" "chef-analytics" {
     delete_on_termination = "${var.root_delete_termination}"
     volume_size = "${var.root_volume_size}"
     volume_type = "${var.root_volume_type}"
-    tags = {
-      Name      = "${var.hostname}.${var.domain}"
-    }
   }
   connection {
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
