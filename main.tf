@@ -93,9 +93,19 @@ resource "null_resource" "oc_id-analytics" {
   # Generate new attributes file with analytics oc_id subscription
   provisioner "local-exec" {
     command = <<-EOC
-      set +x
       rm -rf .analytics ; mkdir -p .analytics
-			[ ${var.accept_license} -gt 0 ] && touch .analytics/.license.accepted || echo "Chef MLSA not accepted"
+			if [ "${var.accept_license}" == "true" ]
+			then
+			  touch .analytics/.license.accepted
+			elif [ "${var.accept_license}" == "false" ]
+			then
+			  continue
+			elif [ ${var.accept_license} -gt 0 ]
+			then
+			  touch .analytics/.license.accepted
+			else
+			  continue
+			fi
 			[ ! -f .analytics/.license.accepted ] && exit 1
       bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
       grep -q 'configuration' .analytics/attributes.json.orig
