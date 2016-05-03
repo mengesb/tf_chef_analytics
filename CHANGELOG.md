@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.2.1 (2016-05-03)
+-------------------
+- [Brian Menges] - Finally fixed Chef MLSA handling
+
 v1.2.0 (2016-05-03)
 -------------------
 - [Brian Menges] - missed [CHANGELOG.md](CHANGELOG.md) in prior commit
