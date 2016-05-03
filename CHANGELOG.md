@@ -3,6 +3,14 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.2.0 (2016-05-03)
+-------------------
+- [Brian Menges] - missed [CHANGELOG.md](CHANGELOG.md) in prior commit
+
+v1.1.9 (2016-05-03)
+-------------------
+- [Brian Menges] - missed [main.tf](main.tf) in prior commit
+
 v1.1.8 (2016-05-03)
 -------------------
 - [Brian Menges] - Too many issues using `null_resource.oc_id-analytics`. Using `null_resource.chef_mlsa` now
