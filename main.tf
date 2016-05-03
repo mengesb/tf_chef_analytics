@@ -99,7 +99,8 @@ resource "null_resource" "chef_mlsa" {
       else
         continue
       fi
-      [ ! -f .analytics/.license.accepted ] && exit 1
+      [ -f .analytics/.license.accepted ] && echo "Chef MLSA accepted" || echo "Chef MLSA NOT accepted"
+      [ -f .analytics/.license.accepted ] && exit 0                    || exit 1
       EOC
   }
 }
