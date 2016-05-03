@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.1.8 (2016-05-03)
+-------------------
+- [Brian Menges] - Too many issues using `null_resource.oc_id-analytics`. Using `null_resource.chef_mlsa` now
+
 v1.1.7 (2016-05-03)
 -------------------
 - [Brian Menges] - Somehow tabs got into this thing...
