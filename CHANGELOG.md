@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.1.7 (2016-05-03)
+-------------------
+- [Brian Menges] - Somehow tabs got into this thing...
+
 v1.1.6 (2016-05-02)
 -------------------
 - [Brian Menges] - Terraform variables in `terraform.tfvars` or command-line are strings, not boolean like in `variables.tf` or other plan files
