@@ -95,6 +95,8 @@ resource "null_resource" "oc_id-analytics" {
     command = <<-EOC
       set +x
       rm -rf .analytics ; mkdir -p .analytics
+			[ ${var.accept_license} -gt 0 ] && touch .analytics/.license.accepted || echo "Chef MLSA not accepted"
+			[ ! -f .analytics/.license.accepted ] && exit 1
       bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
       grep -q 'configuration' .analytics/attributes.json.orig
       [ $? -ne 0 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
