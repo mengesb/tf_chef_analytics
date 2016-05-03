@@ -94,19 +94,19 @@ resource "null_resource" "oc_id-analytics" {
   provisioner "local-exec" {
     command = <<-EOC
       rm -rf .analytics ; mkdir -p .analytics
-			if [ "${var.accept_license}" == "true" ]
-			then
-			  touch .analytics/.license.accepted
-			elif [ "${var.accept_license}" == "false" ]
-			then
-			  continue
-			elif [ ${var.accept_license} -gt 0 ]
-			then
-			  touch .analytics/.license.accepted
-			else
-			  continue
-			fi
-			[ ! -f .analytics/.license.accepted ] && exit 1
+      if [ "${var.accept_license}" == "true" ]
+      then
+        touch .analytics/.license.accepted
+      elif [ "${var.accept_license}" == "false" ]
+      then
+        continue
+      elif [ ${var.accept_license} -gt 0 ]
+      then
+        touch .analytics/.license.accepted
+      else
+        continue
+      fi
+      [ ! -f .analytics/.license.accepted ] && exit 1
       bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
       grep -q 'configuration' .analytics/attributes.json.orig
       [ $? -ne 0 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
