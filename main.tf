@@ -81,16 +81,9 @@ resource "null_resource" "wait_on" {
   }
 }
 #
-# Analytics oc-id
+# Chef MLSA
 #
-resource "null_resource" "oc_id-analytics" {
-  depends_on = ["template_file.attributes-json","null_resource.wait_on"]
-  connection {
-    user        = "${lookup(var.ami_usermap, var.ami_os)}"
-    private_key = "${var.aws_private_key_file}"
-    host        = "${var.chef_fqdn}"
-  }
-  # Generate new attributes file with analytics oc_id subscription
+resource "null_resource" "chef_mlsa" {
   provisioner "local-exec" {
     command = <<-EOC
       rm -rf .analytics ; mkdir -p .analytics
@@ -107,6 +100,22 @@ resource "null_resource" "oc_id-analytics" {
         continue
       fi
       [ ! -f .analytics/.license.accepted ] && exit 1
+      EOC
+  }
+}
+#
+# Analytics oc-id
+#
+resource "null_resource" "oc_id-analytics" {
+  depends_on = ["template_file.attributes-json","null_resource.chef_mlsa","null_resource.wait_on"]
+  connection {
+    user        = "${lookup(var.ami_usermap, var.ami_os)}"
+    private_key = "${var.aws_private_key_file}"
+    host        = "${var.chef_fqdn}"
+  }
+  # Generate new attributes file with analytics oc_id subscription
+  provisioner "local-exec" {
+    command = <<-EOC
       bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
       grep -q 'configuration' .analytics/attributes.json.orig
       [ $? -ne 0 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
