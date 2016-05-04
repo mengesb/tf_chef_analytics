@@ -131,7 +131,7 @@ variable "chef_sg" {
 }
 variable "client_version" {
   description = "Version of the chef-client software to install"
-  default     = "12.8.1"
+  default     = "12.10.24"
 }
 variable "domain" {
   description = "Server domain name"
@@ -183,4 +183,3 @@ variable "wait_on" {
   description = "Variable to hold outputs of other moudles to force waiting"
   default     = "Nothing"
 }
-

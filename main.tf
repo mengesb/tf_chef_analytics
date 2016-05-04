@@ -81,34 +81,10 @@ resource "null_resource" "wait_on" {
   }
 }
 #
-# Chef MLSA
-#
-resource "null_resource" "chef_mlsa" {
-  provisioner "local-exec" {
-    command = <<-EOC
-      rm -rf .analytics ; mkdir -p .analytics
-      if [ "${var.accept_license}" == "true" ]
-      then
-        touch .analytics/.license.accepted
-      elif [ "${var.accept_license}" == "false" ]
-      then
-        continue
-      elif [ ${var.accept_license} -gt 0 ]
-      then
-        touch .analytics/.license.accepted
-      else
-        continue
-      fi
-      [ -f .analytics/.license.accepted ] && echo "Chef MLSA accepted" || echo "Chef MLSA NOT accepted"
-      [ -f .analytics/.license.accepted ] && exit 0                    || exit 1
-      EOC
-  }
-}
-#
 # Analytics oc-id
 #
 resource "null_resource" "oc_id-analytics" {
-  depends_on = ["template_file.attributes-json","null_resource.chef_mlsa","null_resource.wait_on"]
+  depends_on = ["template_file.attributes-json","null_resource.wait_on"]
   connection {
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
     private_key = "${var.aws_private_key_file}"
@@ -116,35 +92,7 @@ resource "null_resource" "oc_id-analytics" {
   }
   # Generate new attributes file with analytics oc_id subscription
   provisioner "local-exec" {
-    command = <<-EOC
-      bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
-      grep -q 'configuration' .analytics/attributes.json.orig
-      [ $? -ne 0 ] && rm -f .analytics/attributes.json.orig && echo "Taking another 30s nap" && sleep 30 && bash ${path.module}/files/chef_api_request GET "/nodes/${var.chef_fqdn}" | jq '.normal' > .analytics/attributes.json.orig
-      cp .analytics/attributes.json.orig .analytics/attributes.json
-      grep -q 'rabbitmq' .analytics/attributes.json.orig
-      rabbit=$?
-      # Delete any potentially existing rabbitmq configuration that will hurt us
-      [ $rabbit -eq 0 ] && sed "s/rabbitmq\['vip'\][[:space:]]=[[:space:]]'\([[:digit:]]*\.\)\{3\}[[:digit:]]*'\\\n//"             .analytics/attributes.json > .analytics/attributes.json.new
-      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
-      [ $rabbit -eq 0 ] && sed "s/rabbitmq\['node_ip_address'\][[:space:]]=[[:space:]]'\([[:digit:]]*\.\)\{3\}[[:digit:]]*'\\\n//" .analytics/attributes.json > .analytics/attributes.json.new
-      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
-      # Look for existing oc_id['applications']
-      grep -q 'applications' .analytics/attributes.json.orig
-      result=$?
-      # FOUND... appending
-      [ $result -eq 0 ] && sed "s/\(applications.*\\\n  }\)\\\n/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n/" .analytics/attributes.json > .analytics/attributes.json.new
-      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
-      [ $result -eq 0 ] && sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/"                       .analytics/attributes.json > .analytics/attributes.json.new
-      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
-      # NOT FOUND... adding
-      [ $result -ne 0 ] && sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${var.chef_ip}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${var.hostname}.${var.domain}\/'\\\n  }\\\n}\\\n\",/" .analytics/attributes.json > .analytics/attributes.json.new
-      [ -f .analytics/attributes.json.new ] && mv .analytics/attributes.json.new .analytics/attributes.json
-      tee .analytics/rabbitmq.modify <<EOF
-      rabbitmq['vip'] = '${var.chef_ip}'
-      rabbitmq['node_ip_address'] = '0.0.0.0'
-      EOF
-      echo "Modified Chef server attributes at .analytics/attributes.json"
-      EOC
+    command = "${path.module}/files/analytics-oc-id.sh -v -c ${var.chef_fqdn} -i ${var.chef_ip} -p ${path.module} -t .analytics"
   }
   # Upload new attributes file
   provisioner "file" {
@@ -156,60 +104,29 @@ resource "null_resource" "oc_id-analytics" {
     source      = ".analytics/rabbitmq.modify"
     destination = "rabbitmq.modify"
   }
-  # Execute new Chef run if no analytics.json exists
-  # https://docs.chef.io/install_analytics.html
+  #
   provisioner "remote-exec" {
-    inline = [
-      "rm -rf .analytics ; mkdir -p .analytics",
-      "[ -f /etc/opscode/oc-id-applications/analytics.json ] && analytics=0 || analytics=1",
-      "if [ $analytics -eq 0 ]",
-      "then",
-      "  echo Existing configuration found... harvesting",
-      "  sudo cp /etc/opscode/oc-id-applications/analytics.json .analytics/analytics.json",
-      "  sudo cp /etc/opscode-analytics/actions-source.json .analytics/actions-source.json",
-      "  sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/analytics.json .analytics/actions-source.json",
-      "  exit 0",
-      "fi",
-      "sudo grep -q rabbitmq /etc/opscode/chef-server.rb",
-      "if [ $? -eq 0 ]",
-      "then",
-      "  sudo grep rabbitmq /etc/opscode/chef-server.rb > .analytics/rabbitmq.saved",
-      "  sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/rabbitmq.saved",
-      "  sudo sed -i.bak '/rabbitmq/d' /etc/opscode/chef-server.rb",
-      "fi",
-      "sudo chef-server-ctl stop",
-      "cat rabbitmq.modify | sudo tee -a /etc/opscode/chef-server.rb",
-      "echo '/etc/opscode/chef-server.rb contents:' && sudo cat /etc/opscode/chef-server.rb",
-      "sudo chef-server-ctl reconfigure",
-      "sudo chef-server-ctl restart",
-      "sudo opscode-manage-ctl reconfigure",
-      "echo 'Taking a 15 second nap...' && sleep 15",
-      "sudo chef-client -j attributes.json",
-      "mv attributes.json rabbitmq.modify /tmp",
-      "sudo cp /etc/opscode/oc-id-applications/analytics.json .analytics/analytics.json",
-      "sudo cp /etc/opscode-analytics/actions-source.json .analytics/actions-source.json",
-      "sudo chown ${lookup(var.ami_usermap, var.ami_os)} .analytics/analytics.json .analytics/actions-source.json",
-    ]
+    script      = "${path.module}/files/apply-analytics.sh"
   }
   # Copy back configuration
   provisioner "local-exec" {
-    command = "scp -r -o StrictHostKeyChecking=no ${lookup(var.ami_usermap, var.ami_os)}@${var.chef_fqdn}:.analytics/*.json .analytics/"
+    command     = "scp -r -o StrictHostKeyChecking=no ${lookup(var.ami_usermap, var.ami_os)}@${var.chef_fqdn}:.analytics/actions-source.json .analytics/"
   }
   # Download required cookbooks
   provisioner "local-exec" {
-    command = "rm -rf cookbooks ; git clone https://github.com/chef-cookbooks/chef-analytics cookbooks/chef-analytics"
+    command     = "rm -rf cookbooks ; git clone https://github.com/chef-cookbooks/chef-analytics cookbooks/chef-analytics"
   }
   # Remove conflicting .chef directory
   provisioner "local-exec" {
-    command = "rm -rf cookbooks/chef-analytics/.chef"
+    command     = "rm -rf cookbooks/chef-analytics/.chef"
   }
   # Upload required cookbooks
   provisioner "local-exec" {
-    command = "cd cookbooks/chef-analytics && berks install && berks upload"
+    command     = "cd cookbooks/chef-analytics && berks install && berks upload"
   }
   # Clean up
   provisioner "local-exec" {
-    command = "rm -rf cookbooks"
+    command     = "rm -rf cookbooks"
   }
 }
 #
@@ -240,19 +157,14 @@ resource "aws_instance" "chef-analytics" {
   }
   # Clean up any potential node/client conflicts
   provisioner "local-exec" {
-    command = "knife node-delete   ${var.hostname}.${var.domain} -y -c ${var.knife_rb} ; echo OK"
+    command     = "knife node-delete   ${var.hostname}.${var.domain} -y -c ${var.knife_rb} ; echo OK"
   }
   provisioner "local-exec" {
-    command = "knife client-delete ${var.hostname}.${var.domain} -y -c ${var.knife_rb} ; echo OK"
+    command     = "knife client-delete ${var.hostname}.${var.domain} -y -c ${var.knife_rb} ; echo OK"
   }
   # Handle iptables
   provisioner "remote-exec" {
-    inline = [
-      "sudo service iptables stop",
-      "sudo chkconfig iptables off",
-      "sudo ufw disable",
-      "echo Say WHAT one more time"
-    ]
+    script      = "${path.module}/files/disable_firewall.sh"
   }
   # Prepare some directories to stage files
   provisioner "remote-exec" {
@@ -260,10 +172,6 @@ resource "aws_instance" "chef-analytics" {
       "mkdir -p .analytics",
       "sudo mkdir -p /etc/opscode-analytics /var/opt/opscode-analytics/ssl",
     ]
-  }
-  provisioner "file" {
-    source      = ".analytics/.license.accepted"
-    destination = ".analytics/.license.accepted"
   }
   provisioner "file" {
     source      = ".analytics/actions-source.json"
@@ -280,7 +188,6 @@ resource "aws_instance" "chef-analytics" {
   # Move files to final location
   provisioner "remote-exec" {
     inline = [
-      "[ -f .analytics/.license.accepted ] && sudo mv .analytics/.license.accepted /var/opt/opscode-analytics/.license.accepted"
       "sudo mv .analytics/${var.hostname}.${var.domain}.* /var/opt/opscode-analytics/ssl",
       "sudo mv .analytics/actions-source.json /etc/opscode-analytics/actions-source.json",
       "sudo chown -R root:root /etc/opscode-analytics /var/opt/opscode-analytics",
