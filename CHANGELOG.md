@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.2.3 (2016-05-03)
+-------------------
+- [Brian Menges] - Fixed syntax issue in [main.tf](main.tf), missing comma in remote-exec call
+
 v1.2.2 (2016-05-03)
 -------------------
 - [Brian Menges] - Adding manual '.license.accepted' method to accepting Chef MLSA
