@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.2.2 (2016-05-03)
+-------------------
+- [Brian Menges] - Adding manual '.license.accepted' method to accepting Chef MLSA
+
 v1.2.1 (2016-05-03)
 -------------------
 - [Brian Menges] - Finally fixed Chef MLSA handling

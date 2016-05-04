@@ -262,6 +262,10 @@ resource "aws_instance" "chef-analytics" {
     ]
   }
   provisioner "file" {
+    source      = ".analytics/.license.accepted"
+    destination = ".analytics/.license.accepted"
+  }
+  provisioner "file" {
     source      = ".analytics/actions-source.json"
     destination = ".analytics/actions-source.json"
   }
@@ -276,6 +280,7 @@ resource "aws_instance" "chef-analytics" {
   # Move files to final location
   provisioner "remote-exec" {
     inline = [
+      "[ -f .analytics/.license.accepted ] && sudo mv .analytics/.license.accepted /var/opt/opscode-analytics/.license.accepted"
       "sudo mv .analytics/${var.hostname}.${var.domain}.* /var/opt/opscode-analytics/ssl",
       "sudo mv .analytics/actions-source.json /etc/opscode-analytics/actions-source.json",
       "sudo chown -R root:root /etc/opscode-analytics /var/opt/opscode-analytics",
