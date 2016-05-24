@@ -3,6 +3,17 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.3.0 (2016-05-24)
+-------------------
+- [Brian Menges] - Added a [CONTRIBUTING](CONTRIBUTING.md) document
+- [Brian Menges] - Updated [README.md](README.md) to refer to [CONTRIBUTING](CONTRIBUTING.md) document
+- [Brian Menges] - Updated `client_version` to `12.10.24`
+- [Brian Menges] - Replaced remote-exec for firewall disables with a script [disable_firewall.sh](files/disable_firewall.sh)
+- [Brian Menges] - Replaced local execute for chef cookbooks with [chef-cookbooks.sh](files/chef-cookbooks.sh) script
+- [Brian Menges] - Added [terraform.tfvars.example](terraform.tfvars.example) to provide an example for `terraform.tfvars`
+- [Brian Menges] - Documentation updates
+
+
 v1.2.3 (2016-05-03)
 -------------------
 - [Brian Menges] - Fixed syntax issue in [main.tf](main.tf), missing comma in remote-exec call
