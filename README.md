@@ -46,6 +46,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 
 ### tf_chef_analytics variables
 
+* `accept_license`: [Chef MLSA license](https://www.chef.io/online-master-agreement) agreement. Default: `false`; change to `true` to indicate agreement
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
 * `analytics_version`: Version of Chef Analytics to install. Default: `1.4.0`
 * `chef_fqdn`: DNS address of the CHEF Server
@@ -126,7 +127,7 @@ GIST for runtime has not yet been added. Check back later!
 
 ## Contributing
 
-Please understand that this is a work in progress and is subject to change rapidly. Please be sure to keep up to date with the repo should you fork, and feel free to contact me regarding development and suggested direction
+Please understand that this is a work in progress and is subject to change rapidly. Keep up to date with the repo, should you fork, and feel free to contact me regarding development and suggested direction. Familiarize yourself with the [CONTRIBUTING](CONTRIBUTING.md) document before making/submitting changes.
 
 ## `CHANGELOG`
 

@@ -1,0 +1,36 @@
+# Terraform Variables File
+# AWS settings
+aws_access_key       = ""
+#aws_flavor           = ""
+aws_key_name         = ""
+aws_private_key_file = ""
+aws_region           = ""
+aws_secret_key       = ""
+aws_subnet_id        = ""
+aws_vpc_id           = ""
+#
+#
+#
+accept_license       = ""
+allowed_cidrs        = ""
+#ami_os
+#analytics_version    = ""
+chef_fqdn            = ""
+chef_ip              = ""
+chef_org             = ""
+chef_org_validator   = ""
+chef_sg              = ""
+#client_version       = ""
+domain               = ""
+hostname             = ""
+knife_rb             = ""
+#log_to_file          = ""
+#public_ip            = ""
+#root_delete_termination = ""
+#root_volume_size     = ""
+#root_volume_type     = ""
+#server_count         = ""
+ssl_cert             = ""
+ssl_key              = ""
+tag_description      = ""
+#wait_on              = "nothing"
