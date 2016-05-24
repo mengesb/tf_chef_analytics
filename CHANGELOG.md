@@ -10,9 +10,10 @@ v1.3.0 (2016-05-24)
 - [Brian Menges] - Updated `client_version` to `12.10.24`
 - [Brian Menges] - Replaced remote-exec for firewall disables with a script [disable_firewall.sh](files/disable_firewall.sh)
 - [Brian Menges] - Replaced local execute for chef cookbooks with [chef-cookbooks.sh](files/chef-cookbooks.sh) script
+- [Brian Menges] - Add [analytics-oc-id.sh](files/analytics-oc-id.sh) script and replace large code block
+- [Brian Menges] - Add [apply-analytics.sh](files/apply-analytics.sh) script and replace large code block
 - [Brian Menges] - Added [terraform.tfvars.example](terraform.tfvars.example) to provide an example for `terraform.tfvars`
 - [Brian Menges] - Documentation updates
-
 
 v1.2.3 (2016-05-03)
 -------------------
