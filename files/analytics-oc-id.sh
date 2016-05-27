@@ -5,6 +5,7 @@
 #
 
 ATTRIBUTES=0
+CHEF_A=0
 CHEF_H=0
 CHEF_I=0
 COUNT=1
@@ -25,21 +26,24 @@ usage()
   required changes for tf_chef_analytics Terraform plan.
 
   OPTIONS:
+    -a  Chef Analytics FQDN
+    -c  Chef Server FQDN
     -h  This help message
-    -c  Chef FQDN
-    -i  Chef IP
+    -i  Chef Server IP
     -p  Path to find 'files/chef_api_request'
     -t  target directory
     -v  Verbose output
 EOF
 }
 
-while getopts "hc:i:p:t:v" OPTION; do
+while getopts "a:hc:i:p:t:v" OPTION; do
   case "$OPTION" in
-    h)
-      usage && exit 0   ;;
+    a)
+      CHEF_A=$OPTARG    ;;
     c)
       CHEF_H=$OPTARG    ;;
+    h)
+      usage && exit 0   ;;
     i)
       CHEF_I=$OPTARG    ;;
     p)
@@ -97,12 +101,12 @@ RESULT=$?
 # Found oc_id['applications']; appending
 if [ $RESULT -eq 0 ]
 then
-  sed "s/\(applications.*\\\n  }\)\\\n/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${CHEF_H}\/'\\\n  }\\\n/" ${T_DIR}/attributes.json > ${T_DIR}/attributes.json.new
+  sed "s/\(applications.*\\\n  }\)\\\n/\1,\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${CHEF_A}\/'\\\n  }\\\n/" ${T_DIR}/attributes.json > ${T_DIR}/attributes.json.new
   [ -f ${T_DIR}/attributes.json.new ] && mv ${T_DIR}/attributes.json.new ${T_DIR}/attributes.json
   sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${CHEF_I}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\n\",/"        ${T_DIR}/attributes.json > ${T_DIR}/attributes.json.new
   [ -f ${T_DIR}/attributes.json.new ] && mv ${T_DIR}/attributes.json.new ${T_DIR}/attributes.json
 else
-  sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${CHEF_I}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${CHEF_H}\/'\\\n  }\\\n}\\\n\",/" ${T_DIR}/attributes.json > ${T_DIR}/attributes.json.new
+  sed "s/\(configuration.*\)\",/\1\\\nrabbitmq['vip'] = '${CHEF_I}'\\\nrabbitmq['node_ip_address'] = '0.0.0.0'\\\noc_id['applications'] = {\\\n  'analytics' => {\\\n    'redirect_uri' => 'https:\/\/${CHEF_A}\/'\\\n  }\\\n}\\\n\",/" ${T_DIR}/attributes.json > ${T_DIR}/attributes.json.new
   [ -f ${T_DIR}/attributes.json.new ] && mv ${T_DIR}/attributes.json.new ${T_DIR}/attributes.json
 fi
 
