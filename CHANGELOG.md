@@ -3,6 +3,10 @@ tf_chef_analytics CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_analytics Terraform plan.
 
+v1.3.1 (2016-05-26)
+-------------------
+- [Brian Menges] - BUG: Updated [analytics-oc-id.sh](files/analytics-oc-id.sh) script to supply analytics FQDN
+
 v1.3.0 (2016-05-24)
 -------------------
 - [Brian Menges] - Added a [CONTRIBUTING](CONTRIBUTING.md) document

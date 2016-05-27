@@ -92,7 +92,7 @@ resource "null_resource" "oc_id-analytics" {
   }
   # Generate new attributes file with analytics oc_id subscription
   provisioner "local-exec" {
-    command = "${path.module}/files/analytics-oc-id.sh -v -c ${var.chef_fqdn} -i ${var.chef_ip} -p ${path.module} -t .analytics"
+    command = "${path.module}/files/analytics-oc-id.sh -a ${var.hostname}.${var.domain} -c ${var.chef_fqdn} -i ${var.chef_ip} -p ${path.module} -t .analytics"
   }
   # Upload new attributes file
   provisioner "file" {
